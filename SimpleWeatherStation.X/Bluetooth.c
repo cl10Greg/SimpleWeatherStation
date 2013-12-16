@@ -20,7 +20,14 @@ void initUSART()
 	// RX Pin - input
 	TRISC7 = 1;
 
-        
+        // Set Baudrade - 9600 (from datasheet baudrade table)
+        /* ASYNC baud rates:
+         * BRGH = 0:    FOSC/(64(X+1))
+         * BRGH = 1:    FOSC/(16(X+1))
+         * 20000000/(16(9600+1)) = 130
+         * ~129 on the datasheet                                */
+	SPBRG = 129; //20MHz
+        //SPBRG = 25; //4MHz
         
 	// RX Setting, 8bit, enable receive,
         /* RCSTA:   Receive status and control register
@@ -47,17 +54,8 @@ void initUSART()
          * 1:TRMT   Transmit shift register status bit
          * 0:TX9D   9th bit of transmit data
          * 0010 0100:   0x24                                    */
-        TXSTA = 0x24;
-
-        // Set Baudrade - 9600 (from datasheet baudrade table)
-        /* ASYNC baud rates:
-         * BRGH = 0:    FOSC/(64(X+1))
-         * BRGH = 1:    FOSC/(16(X+1))
-         * 20000000/(16(9600+1)) = 130
-         * ~129 on the datasheet                                */
-	SPBRG = 129; //20MHz
-        //SPBRG = 25; //4MHz
-
+        TXSTA = 0x04;
+        TXEN = 1;
 	
         //Turn on global interrupts
         GIE = 1;
@@ -103,18 +101,8 @@ unsigned char readByte()
      * 1:       Buffer is full
      * 0:       Buffer is empty                     */
     while(!RCIF);
-        
-    // || timeoutCounter < 100){
-        //timeoutCounter++;
-        //__delay_ms(10);
-    //}
 
-    //if(timeoutCounter == 100){
-    //    return timeoutByte;
-    //}else{
-       //Returns the data that is in the receive register
         return RCREG;
-    //}
     
 }
 
@@ -149,13 +137,13 @@ void echoBack()
 void writeString(unsigned char* userString)
 {
     //Create an int to hold the length
-    unsigned int i;
+    unsigned char i;
     //Loops through the length of the char array and writes each byte
     for(i = 0;i<strlen(userString);i++){
         writeByte(userString[i]);
     }
     //Write the length counter to UART
-    writeByte((unsigned char)i);
+    writeByte(i);
     
 }
 /************************************************************************

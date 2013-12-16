@@ -1,89 +1,62 @@
 #include "userMacro.h"
 #include "Bluetooth.h"
 #include <htc.h>
+#include "Temperature.h"
 
-/********************************************************************
- * Function:    readCommands                                        *
- * Type:        Void                                                *
- * Argument:    None                                                *
- * Return:      None                                                *
- * Function:    Read the cmd to determine what information to return*
- *******************************************************************/
-void readCommands(){
 
-    switch(eeprom_read(cmdByteAddr)){
+
+void allCommands(){
+    unsigned char tempVal;
+    unsigned char tempHiByte;
+    unsigned char tempLoByte;
+    unsigned char curTemp[2];
+
+    tempVal = eeprom_read(cmdByteAddr);
+    switch(tempVal){
         //Get temperature
-        case 0:
-            writeByte(userStartByte);
-            writeByte(tempValHAddr);
-            writeByte(tempValLAddr);
+        case 0x30:
+            tempHiByte = eeprom_read(tempValHAddr);
+            tempLoByte = eeprom_read(tempValLAddr);
+            curTemp[0] = tempHiByte;
+            curTemp[1] = tempLoByte;
+            writeString(curTemp);
+            break;
+        case 0x03:
+            tempHiByte = eeprom_read(tempValHAddr);
+            tempLoByte = eeprom_read(tempValLAddr);
+            curTemp[0] = tempHiByte;
+            curTemp[1] = tempLoByte;
+            writeString(curTemp);
             break;
         //Get temp high
-        case 1:
-            writeByte(userStartByte);
-            writeByte(tempHiAddr);
+        case 0x31:
+            //writeByte('T');
+            //writeByte('H');
+            writeByte(eeprom_read(tempHiAddr));
             break;
         //Get temp low
-        case 2:
-            writeByte(userStartByte);
-            writeByte(tempLoAddr);
+        case 0x32:
+            //writeByte('T');
+            //writeByte('L');
+            writeByte(eeprom_read(tempLoAddr));
             break;
         //Get humidity
-        case 3:
-            writeByte(userStartByte);
-            writeByte(humValHAddr);
-            writeByte(humValLAddr);
+        case 0x41:
+            writeByte('H');
             break;
         //Get humidity high
-        case 4:
-            writeByte(userStartByte);
-            writeByte(humHiAddr);
+        case 0x42:
+            writeByte('H');
+            writeByte('H');
             break;
         //Get humidity low
-        case 5:
-            writeByte(userStartByte);
-            writeByte(humLoAddr);
-            break;
-        //Get Time
-        case 6:
-            writeByte(userStartByte);
-            writeByte('R');
-            writeByte('T');
-            writeByte('C');
-            break;
-        //Get all
-        case 7:
-            writeByte(userStartByte);
-            writeByte(tempValHAddr);
-            writeByte(tempValLAddr);
-            writeByte(tempHiAddr);
-            writeByte(tempLoAddr);
-            writeByte(humValHAddr);
-            writeByte(humValLAddr);
-            writeByte(humHiAddr);
-            writeByte(humLoAddr);
-            writeByte('R');
-            writeByte('T');
-            writeByte('C');
+        case 0x43:
+            writeByte('H');
+            writeByte('L');
             break;
         //Error
         default:
-            writeString(readError);
+            writeByte('E');
             break;
     }
-    //Check the cmd byte
-    //Return the data wanted
-}
-
-/********************************************************************
- * Function:    writeCommands                                       *
- * Type:        Void                                                *
- * Argument:    None                                                *
- * Return:      None                                                *
- * Purpose:     Set the system parameter based on user data         *
- *******************************************************************/
-void writeCommands(){
-    //Check the cmd byte
-    //set the values
-    //return ack
 }

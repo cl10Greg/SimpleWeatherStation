@@ -1,0 +1,16 @@
+_readByte: CODE, 302 0 8
+_writeString: CODE, 15 0 28
+_strlen: CODE, 154 0 20
+_initTemp: CODE, 216 0 25
+_main: CODE, 337 0 47
+_readTemp: CODE, 181 0 31
+_allCommands: CODE, 43 0 83
+_selectTemp: CODE, 212 0 4
+_isr: CODE, 268 0 34
+_writeByte: CODE, 147 0 7
+_initADC: CODE, 400 0 9
+i1_eeprom_write: CODE, 310 0 27
+_eeprom_read: CODE, 126 0 21
+_initUSART: CODE, 384 0 16
+_eeprom_write: CODE, 241 0 27
+Total: 387

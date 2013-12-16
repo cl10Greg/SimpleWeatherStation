@@ -35,9 +35,8 @@ __CONFIG(WDTE_OFF & LVP_OFF & BOREN_OFF & FOSC_HS & PWRTE_OFF) ;
 //XT for 4MHZ
 //HS for 20MHz
 
-unsigned char arrStore[50];
-
-void getPacket(void);
+unsigned char rxFlag = 0;
+unsigned char tempRx;
 
 static void interrupt isr(void){
     if(RCIF && RCIE){
@@ -45,7 +44,12 @@ static void interrupt isr(void){
             CREN = 0;
             CREN = 1;
         }
-            getPacket();
+        tempRx = readByte();
+        if(tempRx != newLineChar){
+            //Send back the right data
+            eeprom_write(cmdByteAddr, tempRx);
+            rxFlag = 1;
+        }
     }
 }
 /************************************************************************
@@ -59,10 +63,10 @@ static void interrupt isr(void){
  ***********************************************************************/
 int main()
 {
-    char testString[] = "Welcome\n";
-    //char counterText[] = "Length: ";
+    //unsigned char welcome[] = "Welcome";
     TRISB = 0x00;
     RB1 = 1;
+    //writeString(welcome);
     //Used to setup the ADC
     initADC();
     //User to setup temperature
@@ -70,47 +74,24 @@ int main()
     //Used to setup the UART connection for bluetooth
     initUSART();
 
-    writeString(testString);
     
     //Infinite loop.  Will look for communication and get analog values. Will
     //send and receive data in this loop
     while(1){
-            getTemp();
+        readTemp();
+            //Update error LEDs
             __delay_ms(10);
-
+            //getHum();
+            //Update error LEDs
+            //Update LCD
+            if(rxFlag == 1){
+                allCommands();
+                rxFlag = 0;
+           }
     }
 
     //Should never get to this part of the program.  If it does, there was an
     //error.
     return 0;
-}
-
-void getPacket(){
-    //Data input space (temporarily 25)
-            
-            //Read the UART data
-            readString(arrStore);
-            CREN = 0;
-            //Reset calculated check sum
-            eeprom_write(calcCSByteAddr,0x00);
-            //Break the data up into the data sections
-            parsePacket(arrStore);
-            //Validate the data that is in the packet
-            //If the data is all valid, go and make the response
-            if(validatePacket()){
-                //If valid, check RW byte
-                //If read, find read commands
-                if(eeprom_read(rwByteAddr) == 0){
-                    readCommands();
-                //if write, find write commands
-                }else{
-                    writeCommands();
-                }
-            //If there is an error in the packet, response error
-            }else{
-                //Return error code
-
-            }
-            CREN = 1;
 }
 

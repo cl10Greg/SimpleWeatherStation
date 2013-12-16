@@ -9,8 +9,7 @@
 #define	COMMAND_H
 
 
-void readCommands();
-void writeCommands();
+void allCommands();
 
 #endif	/* COMMAND_H */
 

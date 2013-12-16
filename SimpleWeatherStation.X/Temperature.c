@@ -3,8 +3,10 @@
 #include <htc.h>
 #include "customADC.h"
 
-unsigned int readTemp()
+void readTemp()
 {
+    selectTemp();
+    
     //Turn on ADC
     ADON = 1;
     
@@ -16,9 +18,12 @@ unsigned int readTemp()
     
     //Wait for go/done bit to be cleared
     while(GO_nDONE);
-    
-    //Read AD register pair
-    return ((ADRESH<<8)+ADRESL);
+
+    //Write lower 8 bits here
+    eeprom_write(tempValLAddr,ADRESL);
+     //Write higher 2 bits here
+     eeprom_write(tempValHAddr,ADRESH);
+
 }
 
 void initTemp(){
@@ -40,18 +45,6 @@ void setTempHi(){
 
 void setTempLo(){
     
-}
-
-void getTemp(){
-    unsigned int tempReading;
-        //Select the channel
-        selectTemp();
-        //Get the values
-        tempReading = readTemp();
-        //Write lower 8 bits here
-        eeprom_write(tempValLAddr,tempReading);
-        //Write higher 2 bits here
-        eeprom_write(tempValHAddr+1,tempReading>>8);
 }
 /*unsigned char convertToTemp(){
     

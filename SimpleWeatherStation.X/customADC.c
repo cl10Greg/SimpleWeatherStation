@@ -16,11 +16,10 @@ void initADC()
      * 2:PCFG2      Port configuration control bits
      * 1:PCFG1      Port configuration control bits
      * 0:PCFG0      Port configuration control bits
-     * 0100 0000:   0xC0
+     * 1100 0001:   0xC0
      */
-    ADCON1 = 0x80;
-   //ADCON1 = 0x0F;
-    //ADCON1 = 0x8F;
+    //AN3 is the +Vref
+    ADCON1 = 0xC1;
 
     /* ADCON0:      A/D module control register
      * 7:ADCS1      Conversion clock select bit
@@ -32,7 +31,7 @@ void initADC()
      * 1:Unimplemented
      * 0:ADON       A/D on bit
      * Temperature is connected to AN0
-     * FOSC/64 is 312500 herts (3.2microseconds)
+     * FOSC/32 is 625000 herts (1.6microseconds)
      * 1000 0xx0:   0x80
      * The AD isn't on yet, just configured
      */
